@@ -1,0 +1,54 @@
+@page
+@model sitconnect.Pages.Account.LoginModel
+
+@{
+    Layout = "_Layout";
+    ViewData["title"] = "SITConnect — Login";
+}
+
+@section styles {
+    <link rel="stylesheet" href="~/css/login.css">
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+    
+        @@media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+}
+
+<main class="form-signin">
+    <form class="text-center" method="post">
+        <a class="text-decoration-none text-dark" href="/"><h1 class="mb-4 fw-bold">SITConnect</h1></a>
+        <h3 class="mb-4 fw-normal">Sign in</h3>
+        
+        <div asp-validation-summary="All" class="text-danger text-start"></div>
+
+        <div class="form-floating mb-4">
+            <input asp-for="Input.Email" type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+            <label asp-for="Input.Email" for="floatingInput">Email address</label>
+        </div>
+        <div class="form-floating">
+            <input asp-for="Input.Password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
+            <label asp-for="Input.Password" for="floatingPassword">Password</label>
+            <a href="#"><small class="float-end">Forgot password?</small></a>
+        </div>
+
+        <div class="checkbox mb-4 mt-4 float-start">
+            <label>
+                <input asp-for="Input.RememberMe" type="checkbox"> Remember me
+            </label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+        <p class="mt-4">New user? <a class="text-decoration-none" href="/Account/Register">Register</a></p>
+        <p class="mt-5 mb-3 text-muted">&copy; SITConnect</p>
+    </form>
+</main>

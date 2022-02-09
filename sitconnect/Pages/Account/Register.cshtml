@@ -1,0 +1,118 @@
+@page
+@model sitconnect.Pages.Account.RegisterModel
+
+@{
+    Layout = "_Layout";
+    ViewData["title"] = "SITConnect — Register";
+}
+
+@section styles {
+    <link rel="stylesheet" href="~/css/register.css">
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+    
+        @@media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+}
+
+<main class="form-signin">
+    <form class="text-center" method="post">
+        <h1 class="mb-4 fw-bold">SITConnect</h1>
+        <h3 class="mb-4 fw-normal">Sign up</h3>
+        
+        <div asp-validation-summary="All" class="text-danger text-start"></div>
+        
+        <h4 class="fw-normal text-start">Personal Details</h4>
+        <div class="row g-2 mb-4">
+            <div class="col-md">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="floatingFirstName" placeholder="First name">
+                    <label for="floatingFirstName">First name</label>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="floatingLastName" placeholder="Last name">
+                    <label for="floatingLastName">Last name</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-floating mb-4">
+            <input type="date" class="form-control" id="floatingDate" placeholder="Date of birth">
+            <label for="floatingDate">Date of birth</label>
+        </div>
+        <div class="form-floating mb-4">
+            <input asp-for="Input.Email" type="email" class="form-control" id="floatingEmail" placeholder="Email">
+            <label asp-for="Input.Email" for="floatingEmail">Email address</label>
+        </div>
+        <div class="form-floating mb-4">
+            <input asp-for="Input.Password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
+            <label asp-for="Input.Password" for="floatingPassword">Password</label>
+        </div>
+        <div class="form-floating mb-4">
+            <input asp-for="Input.ConfirmPassword" type="password" class="form-control" id="floatingPassword2" placeholder="Confirm password">
+            <label asp-for="Input.ConfirmPassword" for="floatingPassword2">Confirm password</label>
+        </div>
+        <h4 class="fw-normal text-start">Card Details</h4>
+        <div class="form-floating mb-4">
+            <input type="text" class="form-control" id="floatingCardNo" placeholder="Card number">
+            <label for="floatingCardNo">Card number</label>
+        </div>
+        <div class="row g-2 mb-4">
+            <div class="col-md-8">
+                <div class="form-floating mb-4">
+                    <input type="date" class="form-control" id="floatingExpiryDate" placeholder="Expiry Date">
+                    <label for="floatingExpiryDate">Expiry Date</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-floating mb-4">
+                    <input type="password" max="3" class="form-control" id="floatingCVV" placeholder="CVV">
+                    <label for="floatingCVV">CVV</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-floating mb-4">
+            <input type="text" class="form-control" id="floatingBillingAdd" placeholder="Billing address">
+            <label for="floatingBillingAdd">Billing address</label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+        <p class="mt-4">Have an account? <a class="text-decoration-none" href="/Account/Login">Login</a></p>
+        <p class="mt-5 mb-3 text-muted">&copy; SITConnect</p>
+    </form>
+</main>
+
+@section scripts {
+    <script>
+        function cc_format(value) {
+            var v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
+            var matches = v.match(/\d{4,16}/g);
+            var match = matches && matches[0] || ''
+            var parts = []
+            for (i=0, len=match.length; i<len; i+=4) {
+                parts.push(match.substring(i, i+4))
+            }
+            if (parts.length) {
+                return parts.join(' ')
+            } else {
+                return value
+            }
+      }
+      
+      let inputCardNo = document.getElementById("floatingCardNo");
+      inputCardNo.addEventListener("input", function() {
+          console.log(cc_format(inputCardNo.value));
+        inputCardNo.value = cc_format(inputCardNo.value);
+      });
+    </script>
+}
