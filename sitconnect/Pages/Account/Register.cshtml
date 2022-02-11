@@ -1,4 +1,5 @@
 @page
+@using sitconnect.Pages.Account
 @model sitconnect.Pages.Account.RegisterModel
 
 @{
@@ -26,34 +27,36 @@
 }
 
 <main class="form-signin">
-    <form class="text-center" method="post">
+    <form class="text-center" method="post" enctype="multipart/form-data">
         <h1 class="mb-4 fw-bold">SITConnect</h1>
-        <h3 class="mb-4 fw-normal">Sign up</h3>
+        <h3 class="mb-5 fw-normal">Sign up</h3>
         
         <div asp-validation-summary="All" class="text-danger text-start"></div>
         
-        <h4 class="fw-normal text-start">Personal Details</h4>
+        <h4 class="fw-normal text-start mb-4">Personal Details</h4>
+        <label asp-for="Input.ProfilePic" id="imageLabel" class="custom-file-upload border rounded mb-3"></label><br>
+        <input asp-for="Input.ProfilePic" type="file" id="profilePic" class="mb-2 text-center" accept="image/png, image/jpeg">
         <div class="row g-2 mb-4">
             <div class="col-md">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="floatingFirstName" placeholder="First name">
+                    <input asp-for="Input.FirstName" type="text" class="form-control" id="floatingFirstName" placeholder="First name">
                     <label for="floatingFirstName">First name</label>
                 </div>
             </div>
             <div class="col-md">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="floatingLastName" placeholder="Last name">
+                    <input asp-for="Input.LastName" type="text" class="form-control" id="floatingLastName" placeholder="Last name">
                     <label for="floatingLastName">Last name</label>
                 </div>
             </div>
         </div>
         <div class="form-floating mb-4">
-            <input type="date" class="form-control" id="floatingDate" placeholder="Date of birth">
+            <input asp-for="Input.DateOfBirth" type="date" class="form-control" id="floatingDate" placeholder="Date of birth">
             <label for="floatingDate">Date of birth</label>
         </div>
         <div class="form-floating mb-4">
             <input asp-for="Input.Email" type="email" class="form-control" id="floatingEmail" placeholder="Email">
-            <label asp-for="Input.Email" for="floatingEmail">Email address</label>
+            <label asp-for="Input.Email" for="floatingEmail">Email</label>
         </div>
         <div class="form-floating mb-4">
             <input asp-for="Input.Password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
@@ -63,27 +66,36 @@
             <input asp-for="Input.ConfirmPassword" type="password" class="form-control" id="floatingPassword2" placeholder="Confirm password">
             <label asp-for="Input.ConfirmPassword" for="floatingPassword2">Confirm password</label>
         </div>
-        <h4 class="fw-normal text-start">Card Details</h4>
+        <h4 class="fw-normal text-start">Billing Details</h4>
         <div class="form-floating mb-4">
-            <input type="text" class="form-control" id="floatingCardNo" placeholder="Card number">
+            <input asp-for="Input.CardNumber" type="text" class="form-control" id="floatingCardNo" placeholder="Card number">
             <label for="floatingCardNo">Card number</label>
         </div>
         <div class="row g-2 mb-4">
             <div class="col-md-8">
-                <div class="form-floating mb-4">
-                    <input type="date" class="form-control" id="floatingExpiryDate" placeholder="Expiry Date">
-                    <label for="floatingExpiryDate">Expiry Date</label>
+                <div class="row g-0">
+                    <div class="form-floating col-5">
+                        <input asp-for="Input.ExpiryMonth" type="number" class="form-control" id="floatingExpiryMonth" placeholder="MM" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="2">
+                        <label for="floatingExpiryMonth">MM</label>
+                    </div>
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                        <span class="fs-3 fw-light">/</span>
+                    </div>
+                    <div class="form-floating col-5">
+                        <input asp-for="Input.ExpiryYear" type="number" class="form-control" id="floatingExpiryYear" placeholder="YY" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="2">
+                        <label for="floatingExpiryYear">YY</label>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="form-floating mb-4">
-                    <input type="password" max="3" class="form-control" id="floatingCVV" placeholder="CVV">
+                <div class="form-floating">
+                    <input asp-for="Input.CVV" type="number" class="form-control" id="floatingCVV" placeholder="CVV" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="3">
                     <label for="floatingCVV">CVV</label>
                 </div>
             </div>
         </div>
         <div class="form-floating mb-4">
-            <input type="text" class="form-control" id="floatingBillingAdd" placeholder="Billing address">
+            <input asp-for="Input.BillingAddress" type="text" class="form-control" id="floatingBillingAdd" placeholder="Billing address">
             <label for="floatingBillingAdd">Billing address</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
@@ -107,11 +119,20 @@
             } else {
                 return value
             }
+        }
+        
+      document.getElementById('profilePic').onchange = function() {
+          var reader = new FileReader();
+      
+          reader.onload = function (e) {
+              document.getElementById("imageLabel").style.backgroundImage = 'url("' + e.target.result + '")';
+          };
+      
+          reader.readAsDataURL(this.files[0]);
       }
       
       let inputCardNo = document.getElementById("floatingCardNo");
       inputCardNo.addEventListener("input", function() {
-          console.log(cc_format(inputCardNo.value));
         inputCardNo.value = cc_format(inputCardNo.value);
       });
     </script>

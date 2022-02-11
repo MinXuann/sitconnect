@@ -1,5 +1,8 @@
 @page
+@using Microsoft.Extensions.Configuration
 @model sitconnect.Pages.Account.LoginModel
+
+@inject IConfiguration config
 
 @{
     Layout = "_Layout";
@@ -26,7 +29,7 @@
 }
 
 <main class="form-signin">
-    <form class="text-center" method="post">
+    <form class="text-center" id="signIn" method="post">
         <a class="text-decoration-none text-dark" href="/"><h1 class="mb-4 fw-bold">SITConnect</h1></a>
         <h3 class="mb-4 fw-normal">Sign in</h3>
         
@@ -47,8 +50,24 @@
                 <input asp-for="Input.RememberMe" type="checkbox"> Remember me
             </label>
         </div>
-        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+
+        <button id="submit" class="w-100 btn btn-lg btn-primary g-recaptcha" type="submit">Sign in</button>
+
+        <input asp-for="Input.CaptchaToken" type="hidden" id="token" />
+        
         <p class="mt-4">New user? <a class="text-decoration-none" href="/Account/Register">Register</a></p>
         <p class="mt-5 mb-3 text-muted">&copy; SITConnect</p>
     </form>
 </main>
+
+@section scripts {
+    <script src="https://www.google.com/recaptcha/api.js?render=@config["RecaptchaSiteKey"]"></script>
+    
+    <script>
+    grecaptcha.ready(function() {
+        grecaptcha.execute('@config["RecaptchaSiteKey"]', {action: 'submit'}).then(function(token) {
+            document.getElementById("token").value = token;
+        });
+    });
+    </script>
+}
