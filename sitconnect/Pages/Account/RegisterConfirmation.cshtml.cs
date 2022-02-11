@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authorization;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace sitconnect.Pages.Account
             {
                 return RedirectToPage("/Index");
             }
-
+            
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {

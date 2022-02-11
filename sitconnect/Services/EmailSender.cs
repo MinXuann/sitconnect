@@ -1,10 +1,6 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 

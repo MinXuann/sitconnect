@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using sitconnect.Models;
+using sitconnect.Services;
 
 namespace sitconnect.Pages.Account
 {
@@ -21,14 +23,17 @@ namespace sitconnect.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IConfiguration _config;
 
         public LoginModel(SignInManager<User> signInManager, 
             ILogger<LoginModel> logger,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _config = config;
         }
 
         [BindProperty]
@@ -51,6 +56,8 @@ namespace sitconnect.Pages.Account
 
             [Display(Name = "Remember me")]
             public bool RememberMe { get; set; }
+            
+            public string CaptchaToken { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -74,6 +81,12 @@ namespace sitconnect.Pages.Account
 
             if (ModelState.IsValid)
             {
+                if (!Captcha.ReCaptchaPassed(Input.CaptchaToken, _config["RecaptchaSecretKey"]))
+                {
+                    ModelState.AddModelError(string.Empty, "You failed the CAPTCHA.");
+                    return Page();
+                }
+                
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);

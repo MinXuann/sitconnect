@@ -1,19 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using sitconnect.Data;
 using sitconnect.Models;
+using sitconnect.Services;
 
 namespace sitconnect.Pages.Account
 {
@@ -24,17 +30,24 @@ namespace sitconnect.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly StoreContext _storeContext;
+        private readonly IConfiguration _config;
 
         public RegisterModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            Crypto crypto,
+            IConfiguration config,
+            StoreContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _storeContext = context;
+            _config = config;
         }
 
         [BindProperty]
@@ -45,7 +58,24 @@ namespace sitconnect.Pages.Account
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public class InputModel
-        {   
+        {
+            [Required]
+            [Display(Name = " ")]
+            [DataType(DataType.Upload)]
+            public IFormFile ProfilePic { get; set; }
+            
+            [Required]
+            [Display(Name = "First name")]
+            public string FirstName { get; set; }
+            
+            [Required]
+            [Display(Name = "Last name")]
+            public string LastName { get; set; }
+            
+            [Required]
+            [Display(Name = "Date of birth")]
+            [DataType(DataType.Date)]
+            public DateTime DateOfBirth { get; set; }
             
             [Required]
             [EmailAddress]
@@ -57,11 +87,35 @@ namespace sitconnect.Pages.Account
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
-
+            
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            
+            [Required]
+            [Display(Name = "Card number")]
+            [DataType(DataType.CreditCard)]
+            public string CardNumber { get; set; }
+            
+            [Required]
+            [StringLength(2, ErrorMessage = "Invalid month.")]
+            [Display(Name = "MM")]
+            public string ExpiryMonth { get; set; }
+            
+            [Required]
+            [StringLength(2, ErrorMessage = "Invalid year.")]
+            [Display(Name = "YY")]
+            public string ExpiryYear { get; set; }
+            
+            [Required]
+            [StringLength(3, ErrorMessage = "Invalid CVV.")]
+            [Display(Name = "CVV")]
+            public string CVV { get; set; }
+            
+            [Required]
+            [Display(Name = "Billing Address")]
+            public string BillingAddress { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -74,11 +128,49 @@ namespace sitconnect.Pages.Account
             returnUrl = "returnUrl ?? Url.Content(\"~/\");";
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = Input.Email, Email = Input.Email };
+                Aes aes = Aes.Create();
+                var key = aes.Key;
+                var IV = aes.IV;
+                _config["EncryptionKey"] = Convert.ToBase64String(key);
+                _config["EncryptionIV"] = Convert.ToBase64String(IV);
+                byte[] file = new byte[] { };
+                
+                using (var memoryStream = new MemoryStream())
+                {
+                    await Input.ProfilePic.CopyToAsync(memoryStream);
+
+                    // Upload the file if less than 8 MB
+                    if (memoryStream.Length < 8388608)
+                    {
+                        file = memoryStream.ToArray();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("File", "The file is too large.");
+                    }
+                }
+                
+                var user = new User
+                {
+                    UserName = Input.Email, Email = Input.Email, DateOfBirth = Input.DateOfBirth,
+                    FirstName = Input.FirstName, LastName = Input.LastName, ProfilePic = file
+                };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+                    
+                    var creditCard = new CreditCard
+                    {
+                        UserId = user.Id,
+                        Number = Convert.ToBase64String(Crypto.EncryptStringToBytes_Aes(Input.CardNumber, key, IV)), 
+                        ExpiryMonth = Input.ExpiryMonth,
+                        ExpiryYear = Input.ExpiryYear, 
+                        CVV = Convert.ToBase64String(Crypto.EncryptStringToBytes_Aes(Input.CardNumber, key, IV))
+                    };
+
+                    _storeContext.CreditCards.Add(creditCard);
+                    await _storeContext.SaveChangesAsync();
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -89,7 +181,7 @@ namespace sitconnect.Pages.Account
                         protocol: Request.Scheme);
 
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        $"Please confirm your account using this link {HtmlEncoder.Default.Encode(callbackUrl)}");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
