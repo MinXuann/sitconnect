@@ -8,8 +8,9 @@ namespace sitconnect.Data
     public class StoreContext : IdentityDbContext<User, IdentityRole, string>
     {
         public StoreContext(DbContextOptions<StoreContext> options) : base(options)
-        {
-        }
+        {}
+        
+        public DbSet<CreditCard> CreditCards { get; set; }
 
     }
 }

@@ -28,6 +28,7 @@ namespace sitconnect
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<Crypto>();
             
             services.AddDbContext<StoreContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -46,7 +47,7 @@ namespace sitconnect
                 options.Password.RequiredUniqueChars = 1;
                 
                 // Lockout settings
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
                 options.Lockout.MaxFailedAccessAttempts = 3;
                 options.Lockout.AllowedForNewUsers = true;
                 
