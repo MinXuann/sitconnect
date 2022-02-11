@@ -37,3 +37,11 @@ body {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+.custom-file-upload {
+    background-image: url('../img/profile.png');
+    cursor: pointer;
+    width: 180px; 
+    height: 180px; 
+    background-size: 100% 100%
+}
