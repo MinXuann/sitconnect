@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -59,7 +58,7 @@ namespace sitconnect.Pages.Account
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Upload a profile picture.")]
             [Display(Name = " ")]
             [DataType(DataType.Upload)]
             public IFormFile ProfilePic { get; set; }
@@ -72,9 +71,10 @@ namespace sitconnect.Pages.Account
             [Display(Name = "Last name")]
             public string LastName { get; set; }
             
-            [Required]
+            [Required(ErrorMessage = "The Date of birth field cannot be empty.")]
             [Display(Name = "Date of birth")]
             [DataType(DataType.Date)]
+            
             public DateTime DateOfBirth { get; set; }
             
             [Required]
