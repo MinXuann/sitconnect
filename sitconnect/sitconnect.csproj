@@ -5,6 +5,7 @@
     <UserSecretsId>c4faa13f-d33e-4acc-b1b3-acc29e8d10bd</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="Pages\Account\Manage" />
     <Folder Include="wwwroot\js" />
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +33,10 @@
     <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Identity\Pages\Account\_ViewImports.cshtml" />
+    <UpToDateCheckInput Remove="Areas\Identity\Pages\_ValidationScriptsPartial.cshtml" />
+    <UpToDateCheckInput Remove="Areas\Identity\Pages\_ViewImports.cshtml" />
+    <UpToDateCheckInput Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
     <UpToDateCheckInput Remove="Areas\Identity\Pages\Account\_ViewImports.cshtml" />
     <UpToDateCheckInput Remove="Areas\Identity\Pages\_ValidationScriptsPartial.cshtml" />
     <UpToDateCheckInput Remove="Areas\Identity\Pages\_ViewImports.cshtml" />

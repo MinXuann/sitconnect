@@ -1,4 +1,5 @@
 using System;
+using System.Net.Mime;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -82,6 +83,7 @@ namespace sitconnect
                 app.UseDeveloperExceptionPage();
             }
             
+            app.UseStatusCodePages(MediaTypeNames.Text.Plain, "Status Code Page: {0}");
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
