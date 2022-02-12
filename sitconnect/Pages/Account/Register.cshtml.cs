@@ -96,20 +96,21 @@ namespace sitconnect.Pages.Account
             [Required]
             [Display(Name = "Card number")]
             [DataType(DataType.CreditCard)]
+            [StringLength(20, MinimumLength = 19)]
             public string CardNumber { get; set; }
             
             [Required]
-            [StringLength(2, ErrorMessage = "Invalid month.")]
             [Display(Name = "MM")]
+            [StringLength(2, MinimumLength = 2)]
             public string ExpiryMonth { get; set; }
             
             [Required]
-            [StringLength(2, ErrorMessage = "Invalid year.")]
+            [StringLength(2, MinimumLength = 2)]
             [Display(Name = "YY")]
             public string ExpiryYear { get; set; }
             
             [Required]
-            [StringLength(3, ErrorMessage = "Invalid CVV.")]
+            [StringLength(3, ErrorMessage = "Invalid CVV.", MinimumLength = 3)]
             [Display(Name = "CVV")]
             public string CVV { get; set; }
             
@@ -126,15 +127,33 @@ namespace sitconnect.Pages.Account
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl = "returnUrl ?? Url.Content(\"~/\");";
+
             if (ModelState.IsValid)
             {
+                if (Int32.Parse(Input.ExpiryMonth) > 31 || Int32.Parse(Input.ExpiryMonth) < 1)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid expiry month.");
+                }
+                
+                Console.WriteLine(DateTime.Now.Year.ToString("yy"));
+                if (Int32.Parse(Input.ExpiryYear) < Int32.Parse(DateTime.Now.ToString("yy")))
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid expiry year.");
+                }
+            
+                string extension = Path.GetExtension(Input.ProfilePic.FileName.ToLower());
+                if (!(extension == ".jpeg" || extension == ".jpg" || extension == ".png"))
+                {
+                    ModelState.AddModelError("File", "Invalid profile picture.");
+                }
+                
                 Aes aes = Aes.Create();
                 var key = aes.Key;
                 var IV = aes.IV;
                 _config["EncryptionKey"] = Convert.ToBase64String(key);
                 _config["EncryptionIV"] = Convert.ToBase64String(IV);
                 byte[] file = new byte[] { };
-                
+
                 using (var memoryStream = new MemoryStream())
                 {
                     await Input.ProfilePic.CopyToAsync(memoryStream);

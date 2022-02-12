@@ -68,7 +68,7 @@
         </div>
         <h4 class="fw-normal text-start">Billing Details</h4>
         <div class="form-floating mb-4">
-            <input asp-for="Input.CardNumber" type="text" class="form-control" id="floatingCardNo" placeholder="Card number">
+            <input asp-for="Input.CardNumber" type="text" class="form-control" id="floatingCardNo" placeholder="Card number" maxlength="20">
             <label for="floatingCardNo">Card number</label>
         </div>
         <div class="row g-2 mb-4">
@@ -121,19 +121,19 @@
             }
         }
         
-      document.getElementById('profilePic').onchange = function() {
-          var reader = new FileReader();
+        document.getElementById('profilePic').onchange = function() {
+            var reader = new FileReader();
       
-          reader.onload = function (e) {
-              document.getElementById("imageLabel").style.backgroundImage = 'url("' + e.target.result + '")';
-          };
+            reader.onload = function (e) {
+                document.getElementById("imageLabel").style.backgroundImage = 'url("' + e.target.result + '")';
+            };
       
-          reader.readAsDataURL(this.files[0]);
-      }
+            reader.readAsDataURL(this.files[0]);
+        }
       
-      let inputCardNo = document.getElementById("floatingCardNo");
-      inputCardNo.addEventListener("input", function() {
-        inputCardNo.value = cc_format(inputCardNo.value);
-      });
+        let inputCardNo = document.getElementById("floatingCardNo");
+        inputCardNo.addEventListener("input", function() {
+          inputCardNo.value = cc_format(inputCardNo.value);
+        });
     </script>
 }
