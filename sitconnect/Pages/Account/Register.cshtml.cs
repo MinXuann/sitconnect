@@ -129,7 +129,12 @@ namespace sitconnect.Pages.Account
             returnUrl = "returnUrl ?? Url.Content(\"~/\");";
 
             if (ModelState.IsValid)
-            {
+            {   
+                if (Input.DateOfBirth > DateTime.Now)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid date of birth.");
+                }
+                
                 if (Int32.Parse(Input.ExpiryMonth) > 31 || Int32.Parse(Input.ExpiryMonth) < 1)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid expiry month.");
